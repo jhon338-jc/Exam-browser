@@ -3,144 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Exam Browser App</title>
+    <title>Bypass Smart Exam Browser</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-user-select: none; /* Anti copas teks */
+            user-select: none;
         }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            overflow: hidden; /* Mencegah scroll di body */
-        }
-
-        /* --- Halaman Setup --- */
-        #setup-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: #f0f2f5; 
+            color: #333; 
+            overflow: hidden; 
             height: 100vh;
             width: 100vw;
-            padding: 20px;
         }
 
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
+        /* --- Halaman Depan / Setup --- */
+        #setup-screen { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            width: 100vw; 
+            padding: 20px; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            background: #f0f2f5;
         }
-
-        .card h2 { margin-bottom: 20px; }
-
-        input[type="url"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15); 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center; 
         }
-
-        button {
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
+        .card h2 { 
+            margin-bottom: 8px; 
+            color: #007bff;
+            font-size: 24px;
+        }
+        .card p.subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        input[type="url"] { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 15px; 
+            border: 2px solid #ced4da; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            outline: none;
             transition: 0.3s;
         }
-
-        .btn-primary { background: #007bff; color: white; width: 100%; margin-bottom: 10px; }
+        input[type="url"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+        }
+        
+        button { 
+            padding: 14px 20px; 
+            font-size: 16px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.2s; 
+        }
+        .btn-primary { 
+            background: #007bff; 
+            color: white; 
+            width: 100%; 
+            margin-bottom: 10px; 
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
         .btn-primary:hover { background: #0056b3; }
+        .btn-secondary { 
+            background: #28a745; 
+            color: white; 
+            width: 100%; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        }
+        .btn-secondary:hover { background: #218838; }
         
-        .btn-secondary { background: #28a745; color: white; width: 100%; margin-bottom: 20px; }
-        .btn-secondary:hover { background: #1e7e34; }
-
-        #reader { width: 100%; margin-bottom: 20px; display: none; }
-
-        /* --- Halaman Ujian (Browser View) --- */
-        #exam-screen {
-            display: none;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            background: #fff;
+        #reader { 
+            width: 100%; 
+            margin-bottom: 20px; 
+            display: none; 
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #28a745;
         }
 
-        iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
+        /* --- Halaman Frame Ujian --- */
+        #exam-screen { 
+            display: none; 
+            flex-direction: column; 
+            height: 100vh; 
+            width: 100vw; 
+            background: #fff; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+        }
+        iframe { 
+            flex: 1; 
+            width: 100%; 
+            height: calc(100vh - 60px);
+            border: none; 
         }
 
-        /* Menu Bawah */
-        #bottom-bar {
-            height: 60px;
-            background: #2c3e50;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 10px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        /* Navigasi Control Bawah */
+        #bottom-bar { 
+            height: 60px; 
+            background: #1e293b; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 15px; 
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
         }
-
-        .info-bar { display: flex; flex-direction: column; font-size: 12px; }
-        .info-bar span { margin: 2px 0; font-weight: bold; }
-
+        .info-bar { 
+            display: flex; 
+            flex-direction: column; 
+            font-size: 13px; 
+        }
+        .info-bar span { 
+            margin: 1px 0; 
+            font-weight: 500; 
+            color: #cbd5e1;
+        }
+        #time-display { color: #fff; font-weight: bold; }
+        
         .nav-buttons { display: flex; gap: 10px; }
-        
-        .btn-nav {
-            background: #34495e;
-            color: white;
-            border: 1px solid #455a64;
-            padding: 8px 12px;
-            font-size: 14px;
-            border-radius: 5px;
+        .btn-nav { 
+            background: #334155; 
+            color: white; 
+            padding: 8px 14px; 
+            font-size: 14px; 
+            border-radius: 6px; 
         }
-        .btn-nav:active { background: #1abc9c; }
-
-        .btn-exit { background: #e74c3c; color: white; padding: 8px 15px; border-radius: 5px;}
-        .btn-exit:active { background: #c0392b; }
-
+        .btn-nav:hover { background: #475569; }
+        .btn-exit { 
+            background: #ef4444; 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 6px;
+        }
+        .btn-exit:hover { background: #dc2626; }
     </style>
 </head>
 <body>
 
     <div id="setup-screen">
         <div class="card">
-            <h2>Masuk Ujian</h2>
+            <h2>Exam Browser Pro</h2>
+            <p class="subtitle">Sistem Anti Blokir Iframe & Deteksi Pintar</p>
             
             <div id="reader"></div>
-            <button class="btn-secondary" id="btn-scan" onclick="toggleScanner()">📷 Scan QR Link</button>
+            <button class="btn-secondary" id="btn-scan" onclick="toggleScanner()">📷 Scan QR Soal</button>
             
-            <p style="margin-bottom: 10px;">Atau masukkan link manual:</p>
-            <input type="url" id="url-input" placeholder="https://docs.google.com/forms/..." required>
-            
-            <button class="btn-primary" onclick="masukUjian()">Mulai Ujian 🚀</button>
+            <p style="margin-bottom: 10px; font-size: 14px; color: #555; font-weight: bold;">Atau Input Link Manual / Acak:</p>
+            <input type="url" id="url-input" placeholder="Masukkan link web / form / youtube">
+            <button class="btn-primary" onclick="masukUjian()">Mulai Ujian Sekarang 🚀</button>
         </div>
     </div>
 
     <div id="exam-screen">
-        <iframe id="exam-frame" src=""></iframe>
-        
+        <iframe id="exam-frame" src="" allow="camera; microphone; geolocation;"></iframe>
         <div id="bottom-bar">
             <div class="info-bar">
-                <span id="time-display">Jam: --:--</span>
-                <span id="battery-display">Baterai: --%</span>
+                <span id="time-display">Jam: --:--:--</span>
+                <span id="battery-display">Baterai: Memuat...</span>
             </div>
-            
             <div class="nav-buttons">
                 <button class="btn-nav" onclick="refreshFrame()">🔄 Refresh</button>
                 <button class="btn-exit" onclick="keluarUjian()">❌ Keluar</button>
@@ -151,121 +199,107 @@
     <script>
         let html5QrCode;
         let isScanning = false;
+        let clockInterval;
 
-        // Fungsi Memulai Scanner QR
+        // Kontrol Kamera Scanner QR
         function toggleScanner() {
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
-
+            if (!html5QrCode) { html5QrCode = new Html5Qrcode("reader"); }
             if (isScanning) {
                 html5QrCode.stop().then(() => {
                     document.getElementById("reader").style.display = "none";
                     isScanning = false;
-                    document.getElementById("btn-scan").innerText = "📷 Scan QR Link";
+                    document.getElementById("btn-scan").innerText = "📷 Scan QR Soal";
                 });
             } else {
                 document.getElementById("reader").style.display = "block";
                 html5QrCode.start(
-                    { facingMode: "environment" }, // Pakai kamera belakang
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    (decodedText, decodedResult) => {
-                        // Jika berhasil scan
+                    { facingMode: "environment" },
+                    { fps: 15, qrbox: { width: 250, height: 250 } },
+                    (decodedText) => {
                         document.getElementById('url-input').value = decodedText;
-                        toggleScanner(); // Matikan kamera setelah dapat link
-                        alert("Link berhasil di-scan!");
+                        toggleScanner();
+                        alert("QR Code Berhasil Dibaca!");
                     },
-                    (errorMessage) => {
-                        // error biasa saat belum nemu QR, biarkan saja
-                    }
-                ).catch(err => {
-                    alert("Gagal membuka kamera: " + err);
-                });
+                    (err) => {}
+                ).catch(err => alert("Izin kamera ditolak atau error: " + err));
                 isScanning = true;
-                document.getElementById("btn-scan").innerText = "Tutup Kamera";
+                document.getElementById("btn-scan").innerText = "🛑 Tutup Kamera";
             }
         }
 
-        // Fungsi Masuk Ke Halaman Ujian (Dan Full Screen)
+        // Eksekusi Pindah ke Mode Ujian
         function masukUjian() {
-            let url = document.getElementById('url-input').value;
-            
-            if(!url) {
-                alert("Masukkan link terlebih dahulu!");
+            let inputUrl = document.getElementById('url-input').value.trim();
+            if (!inputUrl) {
+                alert("Peringatan: Silakan isi atau scan link ujian terlebih dahulu!");
                 return;
             }
 
-            // Pastikan URL valid (tambahkan https jika belum ada)
-            if (!/^https?:\/\//i.test(url)) {
-                url = 'https://' + url;
+            // Standarisasi skema URL
+            if (!/^https?:\/\//i.test(inputUrl)) {
+                inputUrl = 'https://' + inputUrl;
             }
 
-            // Minta Full Screen
+            // Aktifkan Fitur Layar Penuh Otomatis
             let elem = document.documentElement;
             if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => {
-                    console.log("Browser menolak fullscreen otomatis", err);
-                });
+                elem.requestFullscreen().catch(err => console.log("Fullscreen diblokir browser"));
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
             }
 
-            // Ubah tampilan
+            // Sembunyikan setup, munculkan ruang ujian
             document.getElementById('setup-screen').style.display = 'none';
             document.getElementById('exam-screen').style.display = 'flex';
             
-            // Masukkan link ke iframe
-            document.getElementById('exam-frame').src = url;
+            // Generate link enkripsi melalui Reverse Proxy Node.js kita di Vercel
+            const proxyEndpoint = window.location.origin + '/api/proxy?url=' + encodeURIComponent(inputUrl);
+            document.getElementById('exam-frame').src = proxyEndpoint;
 
-            // Mulai Jam & Baterai
+            // Jalankan widget info bawah
             updateTime();
-            setInterval(updateTime, 1000);
+            clockInterval = setInterval(updateTime, 1000);
             updateBattery();
         }
 
-        // Fungsi Refresh Iframe
         function refreshFrame() {
             let iframe = document.getElementById('exam-frame');
-            iframe.src = iframe.src;
+            if(iframe.src) {
+                iframe.src = iframe.src;
+            }
         }
 
-        // Fungsi Keluar Ujian
         function keluarUjian() {
-            let confirmExit = confirm("Apakah Anda yakin ingin keluar dari halaman ini?");
-            if (confirmExit) {
-                // Keluar dari fullscreen
-                if (document.exitFullscreen) {
-                    document.exitFullscreen().catch(err => console.log(err));
+            if (confirm("Apakah Anda yakin ingin menyelesaikan dan keluar dari halaman ujian?")) {
+                clearInterval(clockInterval);
+                if (document.exitFullscreen) { 
+                    document.exitFullscreen().catch(err => {}); 
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
                 }
-                // Hapus link dan kembalikan tampilan
                 document.getElementById('exam-frame').src = "";
                 document.getElementById('exam-screen').style.display = 'none';
                 document.getElementById('setup-screen').style.display = 'flex';
             }
         }
 
-        // Fitur Jam
         function updateTime() {
             const now = new Date();
-            let hours = now.getHours().toString().padStart(2, '0');
-            let minutes = now.getMinutes().toString().padStart(2, '0');
-            let seconds = now.getSeconds().toString().padStart(2, '0');
-            document.getElementById('time-display').innerText = `Jam: ${hours}:${minutes}:${seconds}`;
+            document.getElementById('time-display').innerText = `Jam: ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
         }
 
-        // Fitur Baterai (Hanya jalan di browser yang support seperti Chrome Android)
         function updateBattery() {
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(function(battery) {
-                    function updateAllBatteryInfo(){
-                        let level = Math.round(battery.level * 100);
-                        let isCharging = battery.charging ? " (⚡)" : "";
-                        document.getElementById('battery-display').innerText = `Baterai: ${level}% ${isCharging}`;
+                    function info(){
+                        document.getElementById('battery-display').innerText = `Baterai: ${Math.round(battery.level * 100)}%${battery.charging ? " (⚡ Mengisi daya)" : ""}`;
                     }
-                    updateAllBatteryInfo();
-                    battery.addEventListener('levelchange', updateAllBatteryInfo);
-                    battery.addEventListener('chargingchange', updateAllBatteryInfo);
+                    info();
+                    battery.addEventListener('levelchange', info);
+                    battery.addEventListener('chargingchange', info);
                 });
             } else {
-                document.getElementById('battery-display').innerText = "Baterai: Tdk Didukung";
+                document.getElementById('battery-display').innerText = "Baterai: Tidak Didukung Browser";
             }
         }
     </script>
